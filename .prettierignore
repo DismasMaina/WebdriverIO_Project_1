@@ -1,0 +1,13 @@
+node_modules
+dist
+build
+allure-results
+allure-report
+username_pin_preview.png
+*.png
+*.jpg
+*.jpeg
+.env
+.idea
+.vscode
+coverage

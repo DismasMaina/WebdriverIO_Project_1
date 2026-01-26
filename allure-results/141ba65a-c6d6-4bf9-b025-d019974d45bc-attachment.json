@@ -1,0 +1,5 @@
+{
+  "error": "no such element",
+  "message": "no such element: Unable to locate element: {\"method\":\"css selector\",\"selector\":\"#username\"}\n  (Session info: chrome=143.0.7499.193)",
+  "stacktrace": "Symbols not available. Dumping unresolved backtrace:\n\t0x7ff7cdbc8845\n\t0x7ff7cdbc88a0\n\t0x7ff7cd9a165d\n\t0x7ff7cd9f9a33\n\t0x7ff7cd9f9d3c\n\t0x7ff7cda4df67\n\t0x7ff7cda4ac97\n\t0x7ff7cd9eac29\n\t0x7ff7cd9eba93\n\t0x7ff7cdee05a0\n\t0x7ff7cdedaee0\n\t0x7ff7cdef9646\n\t0x7ff7cdbe5d44\n\t0x7ff7cdbeecec\n\t0x7ff7cdbd1f64\n\t0x7ff7cdbd2115\n\t0x7ff7cdbb7e42\n\t0x7ff87b8954e0\n\t0x7ff87cae485b\n"
+}
