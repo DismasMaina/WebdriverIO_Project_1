@@ -12,6 +12,7 @@ describe('Demo Tests', () => {
     // await $('[name="password"]').setValue('SuperSecretPassword!')
     // await $('button[type="submit"]').click()
     // await expect($('#flash')).toHaveTextContaining(
-    // 'You logged into a secure area!')
+    //     'You logged into a secure area!')
+
   })
 })

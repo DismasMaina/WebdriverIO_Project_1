@@ -1,11 +1,13 @@
 {
     "CodeGPT.apiKey": "Anthropic",
     "cSpell.words": [
+        "amslogin",
         "initialising",
         "pageobjects",
         "specfile",
         "sumologic",
         "tomsmith",
-        "wdio"
+        "wdio",
+        "wrongpassword"
     ]
 }
