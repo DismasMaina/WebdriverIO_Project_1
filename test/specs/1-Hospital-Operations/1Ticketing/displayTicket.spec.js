@@ -1,4 +1,4 @@
-import { displayTicket } from '../../helpers/TicketingHelper.js';
+import { displayTicket } from '../../../helpers/TicketingHelper.js';
 
 describe('Ticketing - Display', () => {
   it('should display ticket details', async () => {

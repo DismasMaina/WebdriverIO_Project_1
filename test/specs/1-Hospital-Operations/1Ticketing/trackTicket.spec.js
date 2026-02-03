@@ -1,4 +1,4 @@
-import { trackTicket } from '../../helpers/TicketingHelper.js';
+import { trackTicket } from '../../../helpers/TicketingHelper.js';
 
 describe('Ticketing - Tracking', () => {
   it('should track ticket status', async () => {
