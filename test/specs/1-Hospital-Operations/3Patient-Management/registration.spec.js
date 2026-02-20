@@ -4,7 +4,7 @@ import {
   registerPatient,
   searchPatient,
   viewPatientQueue
-} from '../../helpers/PatientManagementHelper.js';
+} from '../../../helpers/PatientManagementHelper.js';
 
 describe('Patient Management - Patient Registration', () => {
   

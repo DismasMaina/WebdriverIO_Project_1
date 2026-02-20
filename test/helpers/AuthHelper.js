@@ -5,7 +5,7 @@
  * Handles login flow with multiple selector strategies and detailed logging
  */
 
-export async function login(username = "test_maina", password = "5430@Don") {
+export async function login(username = "test_maina", password = "8750@Don") {
   console.log('=== LOGIN HELPER STARTED ===');
   
   try {
@@ -38,11 +38,11 @@ export async function login(username = "test_maina", password = "5430@Don") {
  * Navigate to the application URL
  */
 async function navigateToApp() {
-  const appUrl = "http://192.168.4.39:9000/";
+  const appUrl = "https://hmis-demo.ams.co.ke/";
   const currentUrl = await browser.getUrl();
   
   // If already on app, just check if logged in
-  if (currentUrl.includes("192.168.4.39:9000")) {
+  if (currentUrl.includes("hmis-demo.ams.co.ke")) {
     console.log("Already on application URL, checking login state");
     return;
   }

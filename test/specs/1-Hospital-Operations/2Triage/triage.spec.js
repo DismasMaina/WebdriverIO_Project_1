@@ -1,5 +1,3 @@
-// test/specs/1-Hospital-Operations/2Triage/triage.spec.js
-
 import {
   viewQueue,
   recordVitals,
@@ -29,24 +27,31 @@ describe('Triage - Queue & Vital Records', () => {
 
   /**
    * TEST 2: Record Full Vitals
+   * Using actual ticket TT9717 from the system
    */
   it('should record complete vital signs for patient', async () => {
     try {
       console.log('=== TEST: Record Complete Vitals ===');
       
       const vitals = {
-        temperature: 37.2,
-        pulse: 72,
-        bloodPressureSystolic: 120,
-        bloodPressureDiastolic: 80,
-        respiratoryRate: 16,
-        oxygenSaturation: 98
+        name: 'JP Morgan',
+        temperature: 37.2,    // #temp
+        pulse: 72,            // #pulse
+        systolic: 120,        // #systolic
+        diastolic: 80,        // #diastolic
+        height: 178,          // #height (cm)
+        weight: 64            // #weight (kg)
       };
       
-      const result = await recordVitals('TT9643', vitals);
+      // First: serve the ticket (moves to Vital Records tab)
+      await openTriageMenu();
+      await serveTicket('TT9717');
+      
+      // Then: record vitals
+      const result = await recordVitals('TT9717', vitals);
       
       expect(result.status).toBe('success');
-      expect(result.ticket).toBe('TT9643');
+      expect(result.ticket).toBe('TT9717');
       console.log('✓ Test PASSED: Complete vitals recorded');
     } catch (error) {
       console.error('✗ Test FAILED:', error.message);
@@ -56,17 +61,22 @@ describe('Triage - Queue & Vital Records', () => {
 
   /**
    * TEST 3: Record Minimal Vitals
+   * Using actual ticket TT9720 from the system
    */
   it('should record minimal vital signs (temp and pulse)', async () => {
     try {
       console.log('=== TEST: Record Minimal Vitals ===');
       
+      // First: serve the ticket
+      await openTriageMenu();
+      await serveTicket('TT9720');
+      
       const vitals = {
-        temperature: 36.8,
-        pulse: 68
+        temperature: 36.8,    // #temp
+        pulse: 68             // #pulse
       };
       
-      const result = await recordVitals('TT9644', vitals);
+      const result = await recordVitals('TT9720', vitals);
       
       expect(result.status).toBe('success');
       console.log('✓ Test PASSED: Minimal vitals recorded');
@@ -78,12 +88,13 @@ describe('Triage - Queue & Vital Records', () => {
 
   /**
    * TEST 4: Assign Service
+   * Using actual ticket TT9717 from the system
    */
   it('should assign service to patient', async () => {
     try {
       console.log('=== TEST: Assign Service ===');
       
-      const result = await assignService('TT9643', 'Cardiology');
+      const result = await assignService('TT9717', 'Cardiology');
       
       expect(result.status).toBe('success');
       expect(result.service).toBe('Cardiology');
@@ -96,12 +107,13 @@ describe('Triage - Queue & Vital Records', () => {
 
   /**
    * TEST 5: Update Patient Status
+   * Using actual ticket TT9717 from the system
    */
   it('should update patient status to SERVING', async () => {
     try {
       console.log('=== TEST: Update Patient Status ===');
       
-      const result = await updateStatus('TT9643', 'SERVING');
+      const result = await updateStatus('TT9717', 'SERVING');
       
       expect(result.status).toBe('success');
       expect(result.newStatus).toBe('SERVING');
@@ -122,8 +134,7 @@ describe('Triage - Queue & Vital Records', () => {
       const stats = await getQueueStats();
       
       expect(stats).toBeDefined();
-      expect(stats).toHaveProperty('vitalRecords');
-      expect(stats).toHaveProperty('cardexAllergies');
+      expect(stats).toHaveProperty('totalQueued');
       console.log('✓ Test PASSED: Stats retrieved', stats);
     } catch (error) {
       console.error('✗ Test FAILED:', error.message);
@@ -150,15 +161,16 @@ describe('Triage - Queue & Vital Records', () => {
 
   /**
    * TEST 8: Record Multiple Patients Vitals
+   * Using actual tickets from the system
    */
   it('should record vitals for multiple patients in sequence', async () => {
     try {
       console.log('=== TEST: Multiple Patient Vitals ===');
       
       const patients = [
-        { ticket: 'TT9643', vitals: { temperature: 37.2, pulse: 72 } },
-        { ticket: 'TT9644', vitals: { temperature: 36.9, pulse: 68 } },
-        { ticket: 'TT9646', vitals: { temperature: 37.5, pulse: 75 } }
+        { ticket: 'TT9717', vitals: { temperature: 37.2, pulse: 72 } },
+        { ticket: 'TT9720', vitals: { temperature: 36.9, pulse: 68 } },
+        { ticket: 'TT9728', vitals: { temperature: 37.5, pulse: 75 } }
       ];
       
       let successCount = 0;
@@ -181,6 +193,7 @@ describe('Triage - Queue & Vital Records', () => {
 
   /**
    * TEST 9: Full Triage Workflow
+   * Using actual ticket TT9717 from the system
    */
   it('should complete full triage workflow: view -> record -> assign -> update', async () => {
     try {
@@ -192,22 +205,25 @@ describe('Triage - Queue & Vital Records', () => {
       console.log('  ✓ Queue displayed');
       
       // Step 2: Record vitals
-      const vitalsResult = await recordVitals('TT9643', {
-        temperature: 37.1,
-        pulse: 71,
-        bloodPressureSystolic: 118,
-        bloodPressureDiastolic: 76
+      const vitalsResult = await recordVitals('TT9717', {
+        name: 'Test Patient',
+        temperature: 37.1,    // #temp
+        pulse: 71,            // #pulse
+        systolic: 118,        // #systolic
+        diastolic: 76,        // #diastolic
+        height: 175,          // #height
+        weight: 70            // #weight
       });
       expect(vitalsResult.status).toBe('success');
       console.log('  ✓ Vitals recorded');
       
       // Step 3: Assign service
-      const serviceResult = await assignService('TT9643', 'General');
+      const serviceResult = await assignService('TT9717', 'General');
       expect(serviceResult.status).toBe('success');
       console.log('  ✓ Service assigned');
       
       // Step 4: Update status
-      const statusResult = await updateStatus('TT9643', 'SERVING');
+      const statusResult = await updateStatus('TT9717', 'SERVING');
       expect(statusResult.status).toBe('success');
       console.log('  ✓ Status updated');
       
@@ -225,6 +241,7 @@ describe('Triage - Queue & Vital Records', () => {
 
   /**
    * TEST 10: Different Status Updates
+   * Using actual ticket TT9717 from the system
    */
   it('should update patient status to different values', async () => {
     try {
@@ -234,7 +251,7 @@ describe('Triage - Queue & Vital Records', () => {
       
       for (const status of statuses) {
         try {
-          const result = await updateStatus('TT9643', status);
+          const result = await updateStatus('TT9717', status);
           expect(result.newStatus).toBe(status);
           console.log(`  ✓ Updated to ${status}`);
         } catch (err) {
