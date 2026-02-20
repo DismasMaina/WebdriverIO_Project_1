@@ -6,10 +6,10 @@ import { login } from './AuthHelper.js';
  */
 async function openPatientManagementMenu() {
   console.log('Opening Patient Management menu...');
-  
+
   try {
     await login();
-    
+
     // Click Patient Management menu - from recording step 3
     // Selector: li.ant-menu-submenu-active span with text "Patient Management"
     const pmItems = await $$('//span[contains(text(), "Patient Management")]');
@@ -19,7 +19,7 @@ async function openPatientManagementMenu() {
       console.log('✓ Patient Management menu opened');
       return;
     }
-    
+
     throw new Error('Patient Management menu item not found');
   } catch (error) {
     console.error('Failed to open Patient Management menu:', error.message);
@@ -32,22 +32,22 @@ async function openPatientManagementMenu() {
  */
 async function navigateToPatientEditor() {
   console.log('Navigating to Patient Editor...');
-  
+
   try {
     await openPatientManagementMenu();
     await browser.pause(1500);
     let editorBtn = await $$('=Patient Editor', 'Patient Editor button');
-    
+
     if (editorBtn.length === 0) {
       // Fallback: xpath from recording
       editorBtn = await $$('=Patient Editor', 'Patient Editor button');
     }
-    
+
     if (editorBtn.length === 0) {
       // Final fallback: broader search
       editorBtn = await $$('=Patient Editor', 'Patient Editor button');
     }
-    
+
     if (editorBtn.length > 0) {
       console.log('✓ Found Patient Editor menu item');
       await editorBtn[0].click();
@@ -55,7 +55,7 @@ async function navigateToPatientEditor() {
       console.log('✓ Patient Editor page opened');
       return;
     }
-    
+
     throw new Error('Patient Editor menu not found');
   } catch (error) {
     console.error('Failed to navigate to Patient Editor:', error.message);
@@ -68,19 +68,19 @@ async function navigateToPatientEditor() {
  */
 async function searchPatient(searchTerm) {
   console.log(`=== SEARCH PATIENT: ${searchTerm} ===`);
-  
+
   try {
     await navigateToPatientEditor();
-    
+
     // From recording step 6: #patient_name input
     const searchInput = await $('#patient_name');
-    
+
     if (searchInput) {
       await searchInput.clearValue();
       await browser.pause(500);
       await searchInput.setValue(searchTerm);
       await browser.pause(1000);
-      
+
       // From recording step 8: aria/Search Patient[role="button"]
       // Selector: div:nth-of-type(2) div:nth-of-type(3) > div:nth-of-type(1) button
       const searchBtn = await $$('//button[contains(., "Search Patient")]');
@@ -88,11 +88,11 @@ async function searchPatient(searchTerm) {
         await searchBtn[0].click();
         await browser.pause(2000);
       }
-      
+
       console.log(`✓ Searched for patient: ${searchTerm}`);
       return true;
     }
-    
+
     throw new Error('Search input not found');
   } catch (error) {
     console.error('SEARCH PATIENT FAILED:', error.message);
@@ -105,13 +105,13 @@ async function searchPatient(searchTerm) {
  */
 export async function getPatientDetails(patientId) {
   console.log(`=== GET PATIENT DETAILS: ${patientId} ===`);
-  
+
   try {
     await searchPatient(patientId);
-    
+
     // Wait for search results to load
     await browser.pause(2000);
-    
+
     // Click on first patient in results table
     const patientRows = await $$('table tbody tr');
     if (patientRows.length > 0) {
@@ -120,7 +120,7 @@ export async function getPatientDetails(patientId) {
       console.log(`✓ Patient details opened for: ${patientId}`);
       return { status: 'success', patientId };
     }
-    
+
     throw new Error(`Patient ${patientId} not found in results`);
   } catch (error) {
     console.error('GET PATIENT DETAILS FAILED:', error.message);
@@ -133,21 +133,21 @@ export async function getPatientDetails(patientId) {
  */
 export async function registerPatient(patientData) {
   console.log(`=== REGISTER PATIENT: ${patientData.firstName} ${patientData.lastName} ===`);
-  
+
   try {
     await openPatientManagementMenu();
     await browser.pause(1000);
-    
+
     // Click Patient Registration
     const regButton = await $$('//span[text()="Patient Registration"]');
     if (regButton.length > 0) {
       await regButton[0].click();
       await browser.pause(2000);
     }
-    
+
     // Fill patient data
     await fillPatientForm(patientData);
-    
+
     // Submit form
     console.log('Submitting patient registration...');
     const submitBtn = await $$('//button[contains(., "Submit")]');
@@ -155,13 +155,13 @@ export async function registerPatient(patientData) {
       await submitBtn[0].click();
       await browser.pause(2000);
     }
-    
+
     console.log(`✓ Patient ${patientData.firstName} registered successfully`);
     return {
       status: 'success',
       firstName: patientData.firstName,
       lastName: patientData.lastName,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   } catch (error) {
     console.error('REGISTER PATIENT FAILED:', error.message);
@@ -174,10 +174,10 @@ export async function registerPatient(patientData) {
  */
 export async function updatePatientInfo(patientId, updates) {
   console.log(`=== UPDATE PATIENT: ${patientId} ===`);
-  
+
   try {
     await navigateToPatientEditor();
-    
+
     // Search for patient
     const searchInput = await $('#patient_name');
     if (searchInput) {
@@ -185,7 +185,7 @@ export async function updatePatientInfo(patientId, updates) {
       await browser.pause(500);
       await searchInput.setValue(patientId);
       await browser.pause(1000);
-      
+
       // Click Search button
       const searchBtn = await $$('//button[contains(., "Search Patient")]');
       if (searchBtn.length > 0) {
@@ -193,24 +193,26 @@ export async function updatePatientInfo(patientId, updates) {
         await browser.pause(2000);
       }
     }
-    
+
     // Wait and click first result
     const patientRows = await $$('table tbody tr');
     if (patientRows.length > 0) {
       await patientRows[0].click();
       await browser.pause(2000);
     }
-    
+
     // Fill update form
     await fillPatientForm(updates);
-    
+
     // Save changes
-    const saveBtn = await $$('//button[contains(., "Save")] | //button[contains(., "Update")] | //button[contains(., "Submit")]');
+    const saveBtn = await $$(
+      '//button[contains(., "Save")] | //button[contains(., "Update")] | //button[contains(., "Submit")]'
+    );
     if (saveBtn.length > 0) {
       await saveBtn[0].click();
       await browser.pause(2000);
     }
-    
+
     console.log(`✓ Patient ${patientId} updated successfully`);
     return { status: 'success', patientId };
   } catch (error) {
@@ -224,18 +226,18 @@ export async function updatePatientInfo(patientId, updates) {
  */
 export async function viewPatientQueue() {
   console.log('=== VIEW PATIENT QUEUE ===');
-  
+
   try {
     await openPatientManagementMenu();
     await browser.pause(1000);
-    
+
     // Click Patient Queue
     const queueBtn = await $$('//span[text()="Patient Queue"]');
     if (queueBtn.length > 0) {
       await queueBtn[0].click();
       await browser.pause(2000);
     }
-    
+
     // Verify page loaded by checking for queue-related content
     // Look for any content on the page indicating queue is displayed
     const pageContent = await $('body');
@@ -243,7 +245,7 @@ export async function viewPatientQueue() {
       console.log('✓ Patient queue page displayed');
       return true;
     }
-    
+
     throw new Error('Patient queue page not loaded');
   } catch (error) {
     console.error('Failed to view patient queue:', error.message);
@@ -256,19 +258,21 @@ export async function viewPatientQueue() {
  */
 export async function viewMedicalHistory(patientId) {
   console.log(`=== VIEW MEDICAL HISTORY: ${patientId} ===`);
-  
+
   try {
     await getPatientDetails(patientId);
-    
+
     // Click Medical History tab
-    const historyBtn = await $$('//button[contains(., "History")] | //span[contains(., "History")]');
+    const historyBtn = await $$(
+      '//button[contains(., "History")] | //span[contains(., "History")]'
+    );
     if (historyBtn.length > 0) {
       await historyBtn[0].click();
       await browser.pause(2000);
       console.log(`✓ Medical history displayed for: ${patientId}`);
       return true;
     }
-    
+
     throw new Error('Medical history not available');
   } catch (error) {
     console.error('VIEW MEDICAL HISTORY FAILED:', error.message);
@@ -281,31 +285,31 @@ export async function viewMedicalHistory(patientId) {
  */
 export async function addMedicalNote(patientId, note) {
   console.log(`=== ADD MEDICAL NOTE: ${patientId} ===`);
-  
+
   try {
     await getPatientDetails(patientId);
-    
+
     // Click Add Note button
     const noteBtn = await $$('//button[contains(., "Add Note")] | //button[contains(., "Note")]');
     if (noteBtn.length > 0) {
       await noteBtn[0].click();
       await browser.pause(1500);
     }
-    
+
     // Fill note content
     const noteArea = await $('textarea');
     if (noteArea) {
       await noteArea.setValue(note);
       await browser.pause(500);
     }
-    
+
     // Save note
     const saveBtn = await $$('//button[contains(., "Save")]');
     if (saveBtn.length > 0) {
       await saveBtn[0].click();
       await browser.pause(2000);
     }
-    
+
     console.log(`✓ Medical note added for: ${patientId}`);
     return { status: 'success', patientId };
   } catch (error) {
@@ -319,7 +323,7 @@ export async function addMedicalNote(patientId, note) {
  */
 async function fillPatientForm(data) {
   console.log('Filling patient form...');
-  
+
   try {
     // Fill Patient Name - from recording: #patient_name
     if (data.firstName || data.lastName) {
@@ -335,19 +339,23 @@ async function fillPatientForm(data) {
         console.log(`⚠ Could not fill patient name`);
       }
     }
-    
+
     // Fill other fields
     const allInputs = await $$('input');
-    
+
     // Fill phoneNumber
     if (data.phoneNumber) {
       try {
         for (const input of allInputs) {
           const placeholder = await input.getAttribute('placeholder');
           const type = await input.getAttribute('type');
-          
-          if ((placeholder && (placeholder.toLowerCase().includes('phone') || placeholder.toLowerCase().includes('mobile'))) ||
-              (type === 'tel')) {
+
+          if (
+            (placeholder &&
+              (placeholder.toLowerCase().includes('phone') ||
+                placeholder.toLowerCase().includes('mobile'))) ||
+            type === 'tel'
+          ) {
             await input.clearValue();
             await input.setValue(data.phoneNumber);
             console.log(`✓ Phone Number: ${data.phoneNumber}`);
@@ -358,7 +366,7 @@ async function fillPatientForm(data) {
         console.log(`⚠ Could not fill phone`);
       }
     }
-    
+
     // Fill email
     if (data.email) {
       try {
@@ -375,13 +383,13 @@ async function fillPatientForm(data) {
         console.log(`⚠ Could not fill email`);
       }
     }
-    
+
     // Fill address
     if (data.address) {
       try {
         for (const input of allInputs) {
           const placeholder = await input.getAttribute('placeholder');
-          
+
           if (placeholder && placeholder.toLowerCase().includes('address')) {
             await input.clearValue();
             await input.setValue(data.address);
@@ -393,7 +401,7 @@ async function fillPatientForm(data) {
         console.log(`⚠ Could not fill address`);
       }
     }
-    
+
     // Fill dateOfBirth
     if (data.dateOfBirth) {
       try {
@@ -407,7 +415,7 @@ async function fillPatientForm(data) {
         console.log(`⚠ Could not fill DOB`);
       }
     }
-    
+
     // Fill gender
     if (data.gender) {
       try {
@@ -420,7 +428,7 @@ async function fillPatientForm(data) {
         console.log(`⚠ Could not fill gender`);
       }
     }
-    
+
     await browser.pause(500);
     console.log('✓ Patient form filled');
   } catch (error) {
@@ -428,8 +436,4 @@ async function fillPatientForm(data) {
   }
 }
 
-export { 
-  openPatientManagementMenu, 
-  navigateToPatientEditor,
-  searchPatient
-};
+export { openPatientManagementMenu, navigateToPatientEditor, searchPatient };

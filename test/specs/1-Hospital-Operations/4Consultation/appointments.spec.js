@@ -14,7 +14,6 @@ import {
  * - The modal opens exactly once and is closed once.
  */
 describe('Consultation - Appointments', () => {
-
   let calendarEvents = [];
   let modalText = '';
 
@@ -54,7 +53,9 @@ describe('Consultation - Appointments', () => {
     });
 
     it('should display the monthly calendar view by default', async () => {
-      const calendar = await $('.ant-picker-calendar').isDisplayed().catch(() => false);
+      const calendar = await $('.ant-picker-calendar')
+        .isDisplayed()
+        .catch(() => false);
       expect(calendar).toBe(true);
     });
   });
@@ -90,7 +91,9 @@ describe('Consultation - Appointments', () => {
 
     it('should close the appointment modal and return to the calendar', async () => {
       // Close happened in before() — verify calendar is still visible
-      const calendar = await $('.ant-picker-calendar').isDisplayed().catch(() => false);
+      const calendar = await $('.ant-picker-calendar')
+        .isDisplayed()
+        .catch(() => false);
       expect(calendar).toBe(true);
     });
   });
@@ -102,9 +105,10 @@ describe('Consultation - Appointments', () => {
       // Full proof: events existed + details were captured + modal was closed
       expect(calendarEvents.length).toBeGreaterThan(0);
       expect(modalText).toMatch(/Patient|Appointment|Date|Name/i);
-      const calendar = await $('.ant-picker-calendar').isDisplayed().catch(() => false);
+      const calendar = await $('.ant-picker-calendar')
+        .isDisplayed()
+        .catch(() => false);
       expect(calendar).toBe(true);
     });
   });
-
 });

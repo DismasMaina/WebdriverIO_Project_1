@@ -5,28 +5,28 @@
  * Handles login flow with multiple selector strategies and detailed logging
  */
 
-export async function login(username = "test_maina", password = "8750@Don") {
+export async function login(username = 'test_maina', password = '8750@Don') {
   console.log('=== LOGIN HELPER STARTED ===');
-  
+
   try {
     // Step 1: Navigate to application
     await navigateToApp();
-    
+
     // Step 2: Find and click Sign In button
     await clickSignInButton();
-    
+
     // Step 3: Fill username field
     await fillUsername(username);
-    
+
     // Step 4: Fill password field
     await fillPassword(password);
-    
+
     // Step 5: Show/hide password briefly for verification
     await togglePasswordVisibility();
-    
+
     // Step 6: Submit login form
     await submitLoginForm();
-    
+
     console.log('=== LOGIN COMPLETED SUCCESSFULLY ===');
   } catch (error) {
     console.error('LOGIN FAILED:', error.message);
@@ -38,18 +38,18 @@ export async function login(username = "test_maina", password = "8750@Don") {
  * Navigate to the application URL
  */
 async function navigateToApp() {
-  const appUrl = "https://hmis-demo.ams.co.ke/";
+  const appUrl = 'https://hmis-demo.ams.co.ke/';
   const currentUrl = await browser.getUrl();
-  
+
   // If already on app, just check if logged in
-  if (currentUrl.includes("hmis-demo.ams.co.ke")) {
-    console.log("Already on application URL, checking login state");
+  if (currentUrl.includes('hmis-demo.ams.co.ke')) {
+    console.log('Already on application URL, checking login state');
     return;
   }
-  
+
   console.log(`Navigating to: ${appUrl}`);
   await browser.url(appUrl);
-  console.log("Navigation completed");
+  console.log('Navigation completed');
 }
 
 /**
@@ -57,18 +57,22 @@ async function navigateToApp() {
  */
 async function clickSignInButton() {
   console.log('Looking for Sign In button...');
-  
+
   // Check if already logged in by looking for dashboard/menu elements
   const alreadyLoggedIn = await checkIfLoggedIn();
   if (alreadyLoggedIn) {
     console.log('✓ Already logged in, skipping sign in');
     return;
   }
-  
+
   console.log('⚠ Not logged in, searching for Sign In button');
-  
+
   const signInSelectors = [
-    { type: 'xpath', selector: './/button[contains(., "Sign In") and not(.//button)]', description: 'XPath with text contains' },
+    {
+      type: 'xpath',
+      selector: './/button[contains(., "Sign In") and not(.//button)]',
+      description: 'XPath with text contains',
+    },
     { type: 'partial', selector: 'button*=Sign', description: 'Partial text match - Sign' },
     { type: 'exact', selector: 'button=Sign In', description: 'Exact text match' },
   ];
@@ -97,7 +101,7 @@ async function clickSignInButton() {
       console.log('✓ Page loaded as logged in, skipping sign in');
       return;
     }
-    
+
     // Debug: Log all buttons
     await logAllButtons();
     throw new Error('Sign In button not found. Check button list above.');
@@ -120,7 +124,7 @@ async function checkIfLoggedIn() {
       const loginInputs = await $$('[name="username"]');
       if (loginInputs.length > 0) {
         console.log('⚠ Login form found - NOT logged in');
-        return false;  // On login page, not logged in
+        return false; // On login page, not logged in
       }
     } catch (err) {
       // Couldn't check, continue
@@ -128,12 +132,12 @@ async function checkIfLoggedIn() {
 
     // SECOND: Look for logged-in indicators (menu, dashboard, etc)
     const loggedInSelectors = [
-      'span=Ticketing',                // Menu text (most reliable)
-      '=Ticketing',                    // Ticketing menu item
-      '[class*="ant-menu"]',           // Ant Design menu
-      '.ant-menu-title-content',       // Menu content
-      'button*=Generate',              // Generate Ticket button (on ticketing page)
-      'input[type="tel"]',             // Phone input field (on ticketing page)
+      'span=Ticketing', // Menu text (most reliable)
+      '=Ticketing', // Ticketing menu item
+      '[class*="ant-menu"]', // Ant Design menu
+      '.ant-menu-title-content', // Menu content
+      'button*=Generate', // Generate Ticket button (on ticketing page)
+      'input[type="tel"]', // Phone input field (on ticketing page)
     ];
 
     for (const selector of loggedInSelectors) {
@@ -170,21 +174,21 @@ async function fillUsername(username) {
   try {
     // Check if username field exists
     const fields = await $$('[name="username"]');
-    
+
     if (fields.length === 0) {
       console.log('⚠ Username field not found - likely already logged in');
       return;
     }
-    
+
     console.log(`Filling username: ${username}`);
     await fields[0].clearValue();
-    
+
     // Type each character with small delay for realistic input
     for (let i = 0; i < username.length; i++) {
       await fields[0].addValue(username[i]);
       await browser.pause(80);
     }
-    
+
     await browser.pause(1000);
     console.log('✓ Username field filled');
   } catch (err) {
@@ -199,21 +203,21 @@ async function fillPassword(password) {
   try {
     // Check if password field exists
     const fields = await $$('[name="password"]');
-    
+
     if (fields.length === 0) {
       console.log('⚠ Password field not found - likely already logged in');
       return;
     }
-    
+
     console.log('Filling password field');
     await fields[0].clearValue();
-    
+
     // Type each character with small delay
     for (let i = 0; i < password.length; i++) {
       await fields[0].addValue(password[i]);
       await browser.pause(40);
     }
-    
+
     console.log('✓ Password field filled');
   } catch (err) {
     console.log('⚠ Password field error - likely already logged in');
@@ -225,20 +229,20 @@ async function fillPassword(password) {
  */
 async function togglePasswordVisibility() {
   console.log('Toggling password visibility for verification');
-  
+
   try {
     await browser.execute((sel) => {
       const el = document.querySelector(sel);
       if (el) el.type = 'text';
     }, '[name="password"]');
-    
+
     await browser.pause(500);
-    
+
     await browser.execute((sel) => {
       const el = document.querySelector(sel);
       if (el) el.type = 'password';
     }, '[name="password"]');
-    
+
     console.log('✓ Password visibility toggled');
   } catch (err) {
     console.log('⚠ Password visibility toggle failed (non-critical)');
@@ -250,7 +254,7 @@ async function togglePasswordVisibility() {
  */
 async function submitLoginForm() {
   console.log('Checking for login form...');
-  
+
   const submitSelectors = [
     { selector: '[type="submit"]', description: 'Submit button by type' },
     { selector: 'button[type="submit"]', description: 'Submit button element' },
@@ -259,7 +263,7 @@ async function submitLoginForm() {
   ];
 
   let submitted = false;
-  
+
   for (const selectorObj of submitSelectors) {
     try {
       const buttons = await $$(selectorObj.selector);
@@ -281,9 +285,9 @@ async function submitLoginForm() {
       console.log('✓ Already logged in, skipping form submission');
       return;
     }
-    
+
     console.log('No submit button found, pressing Enter key');
-    await browser.keys("Enter");
+    await browser.keys('Enter');
   }
 
   await browser.pause(5000);
@@ -297,7 +301,7 @@ async function logAllButtons() {
   try {
     const allButtons = await $$('button');
     console.log(`\n=== ALL BUTTONS ON PAGE (${allButtons.length}) ===`);
-    
+
     for (let i = 0; i < allButtons.length; i++) {
       try {
         const text = await allButtons[i].getText();

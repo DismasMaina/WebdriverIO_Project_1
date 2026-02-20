@@ -8,7 +8,6 @@ import {
 } from '../../../helpers/ConsultationHelper.js';
 
 describe('Consultation - Pending', () => {
-
   // ─── Page & Table ─────────────────────────────────────────
 
   it('should load the pending page with at least one row', async () => {
@@ -32,11 +31,12 @@ describe('Consultation - Pending', () => {
     await btns[0].click();
     await browser.pause(1500);
 
-    const modal  = await $('.ant-modal').catch(() => null);
+    const modal = await $('.ant-modal').catch(() => null);
     const drawer = await $('.ant-drawer').catch(() => null);
 
-    const isVisible = (modal  && await modal.isDisplayed().catch(() => false))
-                   || (drawer && await drawer.isDisplayed().catch(() => false));
+    const isVisible =
+      (modal && (await modal.isDisplayed().catch(() => false))) ||
+      (drawer && (await drawer.isDisplayed().catch(() => false)));
 
     await closeModal();
 
@@ -51,5 +51,4 @@ describe('Consultation - Pending', () => {
     expect(result.status).toBe('success');
     expect(result.flow).toBe('pending');
   });
-
 });

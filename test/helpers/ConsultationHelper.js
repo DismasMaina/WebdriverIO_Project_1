@@ -27,8 +27,8 @@ async function openConsultationSubmenu() {
   console.log('Opening Consultation submenu...');
 
   const submenuSelectors = [
-    'li.ant-menu-submenu-active > div > span',  // Pending.json step 3
-    'li.ant-menu-submenu-open > div > span',    // Request.json step 3
+    'li.ant-menu-submenu-active > div > span', // Pending.json step 3
+    'li.ant-menu-submenu-open > div > span', // Request.json step 3
     '//span[contains(text(),"Consultation")]',
     '//span[contains(text(),"Patient Management")]',
   ];
@@ -106,7 +106,7 @@ async function clickRowAction(rowIndex, actionIndex) {
   const selectors = [
     `tr:nth-of-type(${rowIndex}) div:nth-of-type(${actionIndex}) span`,
     `tr:nth-of-type(${rowIndex}) div:nth-of-type(${actionIndex}) button`,
-    `tr.orange-row div:nth-of-type(${actionIndex}) span`,             // Request.json orange rows
+    `tr.orange-row div:nth-of-type(${actionIndex}) span`, // Request.json orange rows
     `table tbody tr:nth-child(${rowIndex}) td:last-child div:nth-of-type(${actionIndex}) button span`,
   ];
 
@@ -300,10 +300,10 @@ async function fillConsultationNotes(notes = {}) {
   console.log('Filling consultation notes...');
 
   const fieldMap = [
-    { key: 'presentingComplaints', selector: '#chief_complaint',   label: 'Presenting Complaints' },
-    { key: 'clinicalFindings',     selector: '#examination_notes', label: 'Clinical Findings' },
-    { key: 'historyNotes',         selector: '#history_notes',     label: 'History of Presenting Complaints' },
-    { key: 'treatmentPlan',        selector: '#treatment_plan',    label: 'Treatment Plan' },
+    { key: 'presentingComplaints', selector: '#chief_complaint', label: 'Presenting Complaints' },
+    { key: 'clinicalFindings', selector: '#examination_notes', label: 'Clinical Findings' },
+    { key: 'historyNotes', selector: '#history_notes', label: 'History of Presenting Complaints' },
+    { key: 'treatmentPlan', selector: '#treatment_plan', label: 'Treatment Plan' },
   ];
 
   for (const { key, selector, label } of fieldMap) {
@@ -402,10 +402,10 @@ async function addDiagnosis(diagnosisSearch = 'test') {
 
   for (const selector of optionSelectors) {
     try {
-      await browser.waitUntil(
-        async () => (await $$(selector)).length > 0,
-        { timeout: 5000, timeoutMsg: `Diagnosis dropdown not appeared: ${selector}` }
-      );
+      await browser.waitUntil(async () => (await $$(selector)).length > 0, {
+        timeout: 5000,
+        timeoutMsg: `Diagnosis dropdown not appeared: ${selector}`,
+      });
       const options = await $$(selector);
       if (options.length > 0) {
         await options[0].click();
@@ -669,10 +669,7 @@ export async function listPendingConsultations() {
  * @param {number}  [options.rowIndex=6]     - 1-based row index (nth-of-type)
  * @param {boolean} [options.closeAfter=true] - Close modal after interaction
  */
-export async function viewPendingConsultation({
-  rowIndex = 6,
-  closeAfter = true,
-} = {}) {
+export async function viewPendingConsultation({ rowIndex = 6, closeAfter = true } = {}) {
   console.log('=== VIEW PENDING CONSULTATION ===');
 
   try {
@@ -708,12 +705,12 @@ export async function viewPendingConsultation({
  */
 async function getCalendarEvents() {
   const eventSelectors = [
-    '.ant-badge-status-text',                  // ✔ confirmed working selector
-    '.ant-picker-calendar-date-content li',    // Ant Design calendar list items
-    '.fc-event',                               // FullCalendar event
-    '.fc-daygrid-event',                       // FullCalendar day-grid event
-    'ul.events li',                            // generic events list
-    '[class*="calendar"] [class*="event"]',    // generic fallback
+    '.ant-badge-status-text', // ✔ confirmed working selector
+    '.ant-picker-calendar-date-content li', // Ant Design calendar list items
+    '.fc-event', // FullCalendar event
+    '.fc-daygrid-event', // FullCalendar day-grid event
+    'ul.events li', // generic events list
+    '[class*="calendar"] [class*="event"]', // generic fallback
   ];
 
   for (const selector of eventSelectors) {
@@ -746,7 +743,9 @@ async function clickCalendarEvent(eventIndex = 0) {
   }
 
   if (eventIndex >= events.length) {
-    throw new Error(`Event index ${eventIndex} out of range — only ${events.length} events visible`);
+    throw new Error(
+      `Event index ${eventIndex} out of range — only ${events.length} events visible`
+    );
   }
 
   await events[eventIndex].click();
@@ -794,10 +793,7 @@ export async function listConsultationAppointments() {
  * @param {number}  [options.eventIndex=0]     - 0-based index of the calendar event to open
  * @param {boolean} [options.closeAfter=true]  - Whether to close the modal after viewing
  */
-export async function viewConsultationAppointment({
-  eventIndex = 0,
-  closeAfter = true,
-} = {}) {
+export async function viewConsultationAppointment({ eventIndex = 0, closeAfter = true } = {}) {
   console.log('=== VIEW CONSULTATION APPOINTMENT ===');
 
   try {
@@ -809,7 +805,12 @@ export async function viewConsultationAppointment({
     }
 
     console.log('=== CONSULTATION APPOINTMENT FLOW COMPLETED ===');
-    return { status: 'success', flow: 'appointment', eventIndex, timestamp: new Date().toISOString() };
+    return {
+      status: 'success',
+      flow: 'appointment',
+      eventIndex,
+      timestamp: new Date().toISOString(),
+    };
   } catch (error) {
     console.error('VIEW CONSULTATION APPOINTMENT FAILED:', error.message);
     throw error;

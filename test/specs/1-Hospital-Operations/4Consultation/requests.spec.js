@@ -27,11 +27,9 @@ import {
  *   - Full end-to-end flow succeeds
  */
 describe('Consultation - Requests', () => {
-
   // ─── Navigation ───────────────────────────────────────────
 
   describe('Navigation', () => {
-
     it('should navigate to the Consultation Requests page', async () => {
       await openConsultationRequests();
 
@@ -46,13 +44,11 @@ describe('Consultation - Requests', () => {
       const rows = await getTableRows();
       expect(rows.length).toBeGreaterThan(0);
     });
-
   });
 
   // ─── Serve a Request ──────────────────────────────────────
 
   describe('Serve Request', () => {
-
     it('should open the consultation form after serving a request row', async () => {
       await openConsultationRequests();
       await serveRequestRow(0);
@@ -72,13 +68,11 @@ describe('Consultation - Requests', () => {
       // result is true if dismissed, false if not present — both are valid
       expect(typeof result).toBe('boolean');
     });
-
   });
 
   // ─── Consultation Notes Form ──────────────────────────────
 
   describe('Consultation Notes', () => {
-
     beforeEach(async () => {
       await openConsultationRequests();
       await serveRequestRow(0);
@@ -116,9 +110,9 @@ describe('Consultation - Requests', () => {
     it('should fill all note fields at once', async () => {
       const notes = {
         presentingComplaints: 'Chest pain',
-        clinicalFindings:     'Elevated BP',
-        historyNotes:         '2-day history of chest tightness',
-        treatmentPlan:        'ECG and cardiology referral',
+        clinicalFindings: 'Elevated BP',
+        historyNotes: '2-day history of chest tightness',
+        treatmentPlan: 'ECG and cardiology referral',
       };
 
       await fillConsultationNotes(notes);
@@ -128,37 +122,37 @@ describe('Consultation - Requests', () => {
       await expect(await $('#history_notes')).toHaveValue(notes.historyNotes);
       await expect(await $('#treatment_plan')).toHaveValue(notes.treatmentPlan);
     });
-
   });
 
   // ─── Diagnosis ────────────────────────────────────────────
 
   describe('Diagnosis', () => {
-
     beforeEach(async () => {
       await openConsultationRequests();
       await serveRequestRow(0);
       await dismissGotItModal();
       await fillConsultationNotes({
         presentingComplaints: 'test',
-        clinicalFindings:     'test',
-        historyNotes:         'test',
-        treatmentPlan:        'test',
+        clinicalFindings: 'test',
+        historyNotes: 'test',
+        treatmentPlan: 'test',
       });
     });
 
     it('should open the diagnosis search field after clicking Add New Diagnosis', async () => {
       // Click the Add New Diagnosis button
-      const addBtn = await $('text/Add New Diagnosis').catch(() => null)
-        || await $('button*=Add New Diagnosis').catch(() => null);
+      const addBtn =
+        (await $('text/Add New Diagnosis').catch(() => null)) ||
+        (await $('button*=Add New Diagnosis').catch(() => null));
 
       if (addBtn) {
         await addBtn.click();
         await browser.pause(1000);
 
         // The diagnosis input should appear
-        const diagInput = await $('[id$="_disease_description"]').catch(() => null)
-          || await $('[placeholder*="diagnosis"]').catch(() => null);
+        const diagInput =
+          (await $('[id$="_disease_description"]').catch(() => null)) ||
+          (await $('[placeholder*="diagnosis"]').catch(() => null));
 
         await expect(diagInput).toBeDisplayed();
       }
@@ -172,22 +166,20 @@ describe('Consultation - Requests', () => {
       // Field will either be populated or the row will have appeared — no error thrown is the key assertion
       expect(true).toBe(true);
     });
-
   });
 
   // ─── Save Notes & Admit ───────────────────────────────────
 
   describe('Save Notes & Admit', () => {
-
     beforeEach(async () => {
       await openConsultationRequests();
       await serveRequestRow(0);
       await dismissGotItModal();
       await fillConsultationNotes({
         presentingComplaints: 'test',
-        clinicalFindings:     'test',
-        historyNotes:         'test',
-        treatmentPlan:        'test',
+        clinicalFindings: 'test',
+        historyNotes: 'test',
+        treatmentPlan: 'test',
       });
       await addDiagnosis('test');
     });
@@ -219,34 +211,32 @@ describe('Consultation - Requests', () => {
     it('should fill all admit form fields', async () => {
       await clickSaveNotesAndAdmit();
       await fillAdmitForm({
-        ward:                  'te',
-        urgency:               'Urgent',
+        ward: 'te',
+        urgency: 'Urgent',
         admissionInstructions: 'Bed rest and IV fluids',
       });
 
       const instrField = await $('#admission_instructions');
       await expect(instrField).toHaveValue('Bed rest and IV fluids');
     });
-
   });
 
   // ─── End-to-End ───────────────────────────────────────────
 
   describe('End-to-End', () => {
-
     it('should complete the full consultation request and admit flow', async () => {
       const result = await processConsultationRequest({
         rowIndex: 0,
         notes: {
           presentingComplaints: 'Abdominal pain',
-          clinicalFindings:     'Tenderness on palpation',
-          historyNotes:         'Pain for 2 days, worsening',
-          treatmentPlan:        'Surgical consult and IV fluids',
+          clinicalFindings: 'Tenderness on palpation',
+          historyNotes: 'Pain for 2 days, worsening',
+          treatmentPlan: 'Surgical consult and IV fluids',
         },
         diagnosisSearch: 'test',
         admitData: {
-          ward:                  'te',
-          urgency:               null,
+          ward: 'te',
+          urgency: null,
           admissionInstructions: 'NBM and IV access',
         },
       });
@@ -261,7 +251,5 @@ describe('Consultation - Requests', () => {
 
       expect(result.status).toBe('success');
     });
-
   });
-
 });

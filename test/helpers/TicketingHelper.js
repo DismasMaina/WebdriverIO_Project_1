@@ -12,10 +12,10 @@ import { login } from './AuthHelper.js';
  */
 async function openTicketingMenu() {
   console.log('Opening Ticketing menu...');
-  
+
   try {
     await login();
-    
+
     // Wait for Ticketing menu to appear with explicit timeout
     await browser.waitUntil(
       async () => {
@@ -24,7 +24,7 @@ async function openTicketingMenu() {
       },
       { timeout: 5000, timeoutMsg: 'Ticketing menu item not found' }
     );
-    
+
     const ticketingItems = await $$('=Ticketing');
     if (ticketingItems.length > 0) {
       await ticketingItems[0].click();
@@ -32,7 +32,7 @@ async function openTicketingMenu() {
       console.log('✓ Ticketing menu opened');
       return;
     }
-    
+
     throw new Error('Ticketing menu item not found');
   } catch (error) {
     console.error('Failed to open Ticketing menu:', error.message);
@@ -45,28 +45,28 @@ async function openTicketingMenu() {
  * @param {string} phoneNumber - Patient phone number
  * @param {string} paymentMethod - Payment method (Cash, Card, etc)
  */
-export async function createTicket(phoneNumber, paymentMethod = "Cash") {
+export async function createTicket(phoneNumber, paymentMethod = 'Cash') {
   console.log(`=== CREATE TICKET: Phone=${phoneNumber}, Payment=${paymentMethod} ===`);
-  
+
   try {
     await openTicketingMenu();
-    
+
     // Step 1: Click Create Ticket
     await clickElement('=Create Ticket', 'Create Ticket button');
     await browser.pause(2000);
-    
+
     // Step 2: Enter phone number
     await fillPhoneNumber(phoneNumber);
     await browser.pause(1000);
-    
+
     // Step 3: Click Generate Ticket (this might open payment options dialog)
     console.log('Clicking Generate Ticket button...');
     await clickElement('=Generate Ticket', 'Generate Ticket button');
-    await browser.pause(3000);  // Wait for modal/dialog to appear
-    
+    await browser.pause(3000); // Wait for modal/dialog to appear
+
     // Step 4: Select payment method (should appear after clicking Generate)
     await selectPaymentMethod(paymentMethod);
-    
+
     // Step 5: Select service type (optional, may not always appear)
     try {
       console.log('Looking for Outpatient Consultation...');
@@ -76,7 +76,7 @@ export async function createTicket(phoneNumber, paymentMethod = "Cash") {
     } catch (err) {
       console.log('⚠ Consultation selection not required or not found:', err.message);
     }
-    
+
     console.log('✓ Ticket created successfully');
     return true;
   } catch (error) {
@@ -92,14 +92,14 @@ export async function createTicket(phoneNumber, paymentMethod = "Cash") {
  */
 export async function reprintTicket(ticketId = null) {
   console.log(`=== REPRINT TICKET${ticketId ? `: ${ticketId}` : ''} ===`);
-  
+
   try {
     await openTicketingMenu();
-    
+
     // Step 1: Click Ticket Reprint
     await clickElement('=Ticket Reprint', 'Ticket Reprint button');
     await browser.pause(3000);
-    
+
     // Step 2: Try to find and click a Reprint button, but with timeout to avoid infinite loop
     try {
       // Use waitUntil with shorter timeout to avoid 120+ attempts
@@ -110,7 +110,7 @@ export async function reprintTicket(ticketId = null) {
         },
         { timeout: 5000, timeoutMsg: 'No Reprint buttons found on page' }
       );
-      
+
       const reprintButtons = await $$('button*=Reprint');
       if (reprintButtons.length > 0) {
         await reprintButtons[0].click();
@@ -127,7 +127,7 @@ export async function reprintTicket(ticketId = null) {
         return true;
       }
     }
-    
+
     console.log('✓ Reprint ticket action completed');
     return true;
   } catch (error) {
@@ -143,21 +143,21 @@ export async function reprintTicket(ticketId = null) {
  */
 export async function displayTicket(ticketId) {
   console.log(`=== DISPLAY TICKET: ${ticketId} ===`);
-  
+
   try {
     await openTicketingMenu();
-    
+
     // Step 1: Click Ticket Display
     await clickElement('=Ticket Display', 'Ticket Display button');
     await browser.pause(2000);
-    
+
     // Step 2: Search for ticket (if ticketId provided)
     if (ticketId) {
       const searchInput = await $('[name="search"]').catch(() => null);
       if (searchInput) {
         await searchInput.setValue(ticketId);
         await browser.pause(500);
-        
+
         const searchBtn = await $('button*=Search').catch(() => null);
         if (searchBtn) {
           await searchBtn.click();
@@ -165,7 +165,7 @@ export async function displayTicket(ticketId) {
         }
       }
     }
-    
+
     await browser.pause(3000);
     console.log('✓ Ticket display completed');
     return true;
@@ -182,21 +182,21 @@ export async function displayTicket(ticketId) {
  */
 export async function trackTicket(ticketId) {
   console.log(`=== TRACK TICKET: ${ticketId} ===`);
-  
+
   try {
     await openTicketingMenu();
-    
+
     // Step 1: Click Ticket Tracking
     await clickElement('=Ticket Tracking', 'Ticket Tracking button');
     await browser.pause(2000);
-    
+
     // Step 2: Enter ticket ID (if provided)
     if (ticketId) {
       const ticketIdInput = await $('[name="ticketId"]').catch(() => null);
       if (ticketIdInput) {
         await ticketIdInput.setValue(ticketId);
         await browser.pause(500);
-        
+
         const trackBtn = await $('button*=Track').catch(() => null);
         if (trackBtn) {
           await trackBtn.click();
@@ -204,7 +204,7 @@ export async function trackTicket(ticketId) {
         }
       }
     }
-    
+
     await browser.pause(3000);
     console.log('✓ Ticket tracking completed');
     return true;
@@ -234,7 +234,7 @@ async function clickElement(selector, elementName) {
  */
 async function fillPhoneNumber(phoneNumber) {
   console.log(`Filling phone number: ${phoneNumber}`);
-  
+
   try {
     const telInput = await $('input[type="tel"]');
     await telInput.setValue(phoneNumber);
@@ -250,26 +250,26 @@ async function fillPhoneNumber(phoneNumber) {
  */
 async function selectPaymentMethod(paymentMethod) {
   console.log(`Selecting payment method: ${paymentMethod}`);
-  
+
   try {
     // Wait a bit more for modal to fully render
     await browser.pause(1500);
-    
+
     // Scroll to ensure buttons are visible
     await browser.execute(() => {
       window.scrollTo(0, document.body.scrollHeight);
     });
-    
+
     await browser.pause(500);
-    
+
     // Try multiple selector strategies
     const selectors = [
-      `button*=${paymentMethod}`,           // Partial text match
-      `button=${paymentMethod}`,            // Exact text match
+      `button*=${paymentMethod}`, // Partial text match
+      `button=${paymentMethod}`, // Exact text match
     ];
-    
+
     let paymentButtons = [];
-    
+
     for (const selector of selectors) {
       paymentButtons = await $$(selector);
       if (paymentButtons.length > 0) {
@@ -277,12 +277,12 @@ async function selectPaymentMethod(paymentMethod) {
         break;
       }
     }
-    
+
     if (paymentButtons.length === 0) {
       // Debug: List all visible buttons
       const allButtons = await $$('button');
       console.log(`⚠ Payment buttons not found. Available buttons: ${allButtons.length}`);
-      
+
       let buttonTexts = [];
       for (let i = 0; i < allButtons.length; i++) {
         try {
@@ -295,10 +295,12 @@ async function selectPaymentMethod(paymentMethod) {
           // Ignore
         }
       }
-      
-      throw new Error(`Payment method button "${paymentMethod}" not found. Available: ${buttonTexts.join(', ')}`);
+
+      throw new Error(
+        `Payment method button "${paymentMethod}" not found. Available: ${buttonTexts.join(', ')}`
+      );
     }
-    
+
     // Scroll button into view and click
     await paymentButtons[0].scrollIntoView();
     await browser.pause(500);
@@ -317,7 +319,7 @@ async function findPrintButton(ticketId) {
   try {
     // Try to find ticket by text in any cell
     const allCells = await $$('td, th');
-    
+
     for (let i = 0; i < allCells.length; i++) {
       const text = await allCells[i].getText();
       if (text.includes(ticketId)) {
@@ -329,7 +331,7 @@ async function findPrintButton(ticketId) {
         }
       }
     }
-    
+
     return null;
   } catch (error) {
     console.log(`Error finding print button: ${error.message}`);

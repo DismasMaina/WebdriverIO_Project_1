@@ -1,9 +1,11 @@
 <!-- Copilot / AI agent instructions for WebdriverIO_Project_1 -->
+
 # Quick agent guide — WebdriverIO_Project_1
 
 This repo contains WebdriverIO E2E tests using Mocha and the Allure reporter. Keep instructions short and actionable: focus on how tests run, where artifacts live, and common patterns you will modify.
 
 -- **Entry points**: tests live under `test/specs/**/*.js`. Key config is [wdio.conf.js](../wdio.conf.js) which sets framework `mocha`, reporter `allure`, and Chrome as the capability.
+
 - **Run tests**: use the npm script or wdio directly:
   - `npm run wdio` (runs `wdio run ./wdio.conf.js`)
   - Or: `npx wdio run ./wdio.conf.js --spec ./test/specs/login.spec.js`
